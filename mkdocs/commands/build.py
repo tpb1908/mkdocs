@@ -1,4 +1,4 @@
-# coding: utf-8
+# -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
 from datetime import datetime
@@ -345,8 +345,7 @@ def build_pages(config, dump_json=False, dirty=False):
             input_path, output_path = get_complete_paths(config, page)
 
             run_shell_command("node " + js_path + " " + str(output_path))
-            #node_out = subprocess.check_output(['npm', 'run', js_path, str(output_path)])
-            #print("Node output is " + str(node_out))
+
 
         except Exception:
             log.error("Error building page %s", page.input_path)
@@ -371,16 +370,16 @@ def run_shell_command(command_line):
             stderr=subprocess.STDOUT,
         )
 
-        process_output, _ =  command_line_process.communicate()
+        process_output, errors = command_line_process.communicate()
 
         # process_output is now a string, not a file,
         # you may want to do:
         # process_output = StringIO(process_output)
-        print ("Process output is " + str(process_output))
+        print ("Process output is " + str(process_output.decode('utf-8').splitlines()))
        # log_subprocess_output(process_output)
     except (Exception) as exception:
 
-        logging.error('Exception occured: ' + str(exception))
+        logging.error('Exception occurred: ' + str(exception))
         logging.info('Subprocess failed')
         return False
     else:

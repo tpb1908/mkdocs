@@ -6,4 +6,5 @@ htmlcov/
 mkdocs.egg-info/
 *.pyc
 .coverage
+test_projects/*
 node/node_modules
