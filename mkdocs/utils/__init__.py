@@ -371,6 +371,25 @@ def convert_markdown(markdown_source, extensions=None, extension_configs=None):
     )
     html_content = md.convert(markdown_source)
 
+
+
+
+    # __location__ = os.path.realpath(
+    #     os.path.join(os.getcwd(), os.path.dirname(__file__)))
+    # print("Working directory " + str(__location__))
+    # jsCode = str(open(__location__ + "/../assets/maths/math_pre_render.js").read())
+    # print(jsCode)
+    # parsed = muterun_js(__location__ + "/../assets/maths/math_pre_render.js", html_content)
+    # print ("Exit code " + str(parsed.exitcode))
+    # print ("Error " + str(parsed.stderr))
+    # #print ("Parsed string from JS " + str(parsed.stdout))
+    # print ("JS return value " + str(parsed))
+    #
+    # ctx = execjs.compile(jsCode)
+    # output = ctx.call("muterun")
+    # print("ExecJS output is " + str(output))
+    # # TODO Pre-render MathJax
+
     # On completely blank markdown files, no Meta or tox properties are added
     # to the generated document.
     meta = getattr(md, 'Meta', {})

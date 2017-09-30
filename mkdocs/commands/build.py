@@ -6,6 +6,10 @@ from calendar import timegm
 import io
 import logging
 import os
+import shlex
+import logging
+import subprocess
+from StringIO import StringIO
 
 from jinja2.exceptions import TemplateNotFound
 import jinja2
@@ -318,6 +322,9 @@ def build_pages(config, dump_json=False, dirty=False):
 
     build_extra_templates(config['extra_templates'], config, site_navigation)
 
+    run_location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+    js_path = run_location.split("/mkdocs")[0] + "/mkdocs/node/index.js"
+
     for page in site_navigation.walk_pages():
 
         try:
@@ -334,13 +341,53 @@ def build_pages(config, dump_json=False, dirty=False):
             html_content, table_of_contents, _ = build_result
             search_index.add_entry_from_context(
                 page, html_content, table_of_contents)
+
+            input_path, output_path = get_complete_paths(config, page)
+
+            run_shell_command("node " + js_path + " " + str(output_path))
+            #node_out = subprocess.check_output(['npm', 'run', js_path, str(output_path)])
+            #print("Node output is " + str(node_out))
+
         except Exception:
             log.error("Error building page %s", page.input_path)
             raise
+    # TODO
+    # Run Node here
+
 
     search_index = search_index.generate_search_index()
     json_output_path = os.path.join(config['site_dir'], 'mkdocs', 'search_index.json')
     utils.write_file(search_index.encode('utf-8'), json_output_path)
+
+def run_shell_command(command_line):
+    command_line_args = shlex.split(command_line)
+
+    print ('Subprocess: "' + command_line + '"')
+
+    try:
+        command_line_process = subprocess.Popen(
+            command_line_args,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+        )
+
+        process_output, _ =  command_line_process.communicate()
+
+        # process_output is now a string, not a file,
+        # you may want to do:
+        # process_output = StringIO(process_output)
+        print ("Process output is " + str(process_output))
+       # log_subprocess_output(process_output)
+    except (Exception) as exception:
+
+        logging.error('Exception occured: ' + str(exception))
+        logging.info('Subprocess failed')
+        return False
+    else:
+        # no exception was raised
+        logging.info('Subprocess finished')
+
+    return True
 
 
 def build(config, live_server=False, dump_json=False, dirty=False):
