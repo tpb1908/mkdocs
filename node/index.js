@@ -1,39 +1,32 @@
 //http://joashc.github.io/posts/2015-09-14-prerender-mathjax.html node script
 
 const mjpage= require("mathjax-node-page").mjpage;
-const jsdom = require("jsdom").jsdom;
 const fs = require("fs");
 const path = require("path");
-
-//mjAPI.start();
 
 var args = process.argv
 var dir = args[2]
 
-
+//TODO Rewrite this so we process all files in one run
+//TODO Add check for whether files contain MathJax
 var renderMathjaxForFile = (fullPath, callback) => {
-    //var fullPath = path.join(dir, fileName);
     var html = fs.readFile(fullPath, (err, data) => {
-    var document = jsdom(data);
-    console.log("Rendering:", fullPath);
     //console.log("HTML is " + data)
+    console.time("Rendering " + fullPath)
     mjpage(
-        document.body.innerHTML,
+        data,
         {
-          renderer: "CommonHTML",
-          inputs: ["TeX"],
-          xmlns:"svg",
-          svg:true
+          singleDollars: true
         },
-        {svg: true},
+        {
+            html: true,
+            css: true,
+            mml: true
+        },
         function(result) {
             "use strict";
-            //console.log("Result is " + result)
-//          document.body.innerHTML = result.html;
-//          var HTML = "<!DOCTYPE html>\n"
-//            + document.documentElement.outerHTML
-//                      .replace(/^(\n|\s)*/, "");
           fs.writeFileSync(fullPath, result);
+          console.timeEnd("Rendering " + fullPath)
           process.exit()
         }
     );
@@ -42,18 +35,3 @@ var renderMathjaxForFile = (fullPath, callback) => {
 
 renderMathjaxForFile(dir);
 
-//var pages = fs.readdirSync(dir);
-
-// Wait for all of these and the homepage
-//var pending = pages.length + 1;
-
-//var closeWhenDone = () => {
-//  pending -= 1;
-//  if (pending === 0) process.exit();
-//};
-
-//renderMathjaxForFile("./_site/", "index.html", closeWhenDone);
-
-//pages.forEach(post => {
-//  renderMathjaxForFile(dir, post, closeWhenDone);
-//});
