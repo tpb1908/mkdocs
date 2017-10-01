@@ -12,7 +12,7 @@ import jinja2
 import json
 
 from mkdocs import nav, search, utils
-from mkdocs.utils import filters
+from mkdocs.utils import filters, plugins
 from mkdocs.relative_path_ext import RelativePathExtension
 import mkdocs
 
@@ -334,6 +334,9 @@ def build_pages(config, dump_json=False, dirty=False):
             html_content, table_of_contents, _ = build_result
             search_index.add_entry_from_context(
                 page, html_content, table_of_contents)
+
+            plugins.call_post_build(output_path)
+
         except Exception:
             log.error("Error building page %s", page.input_path)
             raise
