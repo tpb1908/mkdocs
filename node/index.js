@@ -16,6 +16,7 @@ var renderMathjaxForFile = (fullPath, callback) => {
     mjpage(
         data,
         {
+          format: ["TeX"],
           singleDollars: true
         },
         {
